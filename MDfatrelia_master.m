@@ -5,17 +5,23 @@
 % Results: look at Line1.out or run PlotMoorLine(...).m
 % Line1.out und Line1.txt schliessen vor Start, 
 % damit neue Outputs geschrieben werden können!
+
+
+
 %% Make necessary inputs:
 
 
 % MoorDyn specific Inputs
 
+% give simulation time [s]
+simtime = 300;
+
 % Time Step Size and Number
-Nts = 42000;              %37200;                             % number of coupling time steps
-dt =  0.02;              %0.01;                          % coupling time step size (time between MoorDyn calls)
+dt =  0.01;              %0.01;                          % coupling time step size (time between MoorDyn calls)
+Nts = (simtime+120)/dt;              %37200;                  % number of coupling time steps (add 120s to cut away from simulation at start and ending)
 
 % Give Number of Line Segments (also change in lines.txt (Inputfile))
-nls = 12;
+nls = 18;                       % 12
 
 % Give paths
 % Give MoorDyn Library paths
@@ -52,7 +58,7 @@ Aystep = 0;                              % per loop: how much is Ay [m] stepped 
 
 %% Prep Fatigue Output Matrix
 
-Mfatout = zeros ([nls nloop]);              % Make sure this is 
+Mfatout = zeros ([nls nloop]);
 
 Mtenmean = zeros ([nls nloop]);
 

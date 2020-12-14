@@ -13,6 +13,8 @@ FLines_p = libpointer('doublePtr',FLines_temp);  % access returned value with FL
 
 %% Initialization
 loadlibrary(fileLinesdll,fileMoorDynh);     % load MoorDyn DLL
+
+
 calllib('Lines','LinesInit',pos,v)   % initialize MoorDyn 
     
 %% MoorDyn Simulation Loop
