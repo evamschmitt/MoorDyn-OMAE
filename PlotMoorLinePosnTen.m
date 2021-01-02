@@ -4,14 +4,14 @@
 %% Make necessary inputs:
 
 % Give Number of Line Segments
-nls = 100;
+nls = 50;
 
 % Give File paths
 OutputFileLocation = 'Mooring/Line1.out';
 TxtFileLocation = 'Mooring/Line1.txt';
 
 % Print speed (original speed =1, increase for faster print)
-ps = 100;
+ps = 3;
 
 
 

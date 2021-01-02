@@ -21,8 +21,8 @@ calllib('Lines','LinesInit',pos,v)   % initialize MoorDyn
 for i=1:Nts        
     calllib('Lines', 'LinesCalc', pos, v, FLines_p, Vdt(i), dt);  % some MoorDyn time stepping
     % Update position
-    posx = Ax*sin(1.5 + P/(2*pi*dt)*i);      % x position calculation
-    %posy = Ay*sin(1.5 + P/(2*pi*dt)*i);     % y position calculation
+    posx = Ax*sin(0.526 + (2*pi*dt)*i/P);      % x position calculation %0.526 weil da sinus auf halber höhe anfängt, d.h. in beide richtungen gleich weit schwingt.
+    %posy = Ay*sin(0.526 + (2*pi*dt)*i/P);     % y position calculation
     %Update vectors for MoorDyn
     pos = [posx posy posz rotposx rotposy rotposz];
     
