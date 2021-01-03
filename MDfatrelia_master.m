@@ -46,8 +46,10 @@ R2 = 8167000;       % Minimum Breaking Strength [N] FOR 90MM R4 STUDLESS CHAIN (
 
 
 %% Give Floater Movement
-Ax = 0;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
-Ay = 0;                                  % Amplitude Surge Y [m] (Start, can be stepped up later)
+Ax_start = 0;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
+Ax = Ax_start;
+Ay_start = 0;                                  % Amplitude Surge Y [m] (Start, can be stepped up later)
+Ay = Ay_start;
 P = 20;                                  % Period [s]
 
 
