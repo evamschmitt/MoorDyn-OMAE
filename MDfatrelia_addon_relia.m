@@ -43,13 +43,13 @@ MinerSum_standard_derivation_of_logarithmic_values = 0.05; % just assumption for
 
 
 %% Get further variables from outputfiles
-M_R1 = readmatrix(M_R1,'M_R1.xlsx','Sheet',1);
+M_R1 = readmatrix('M_R1.xlsx','Sheet',1);
 nls = width(M_R1);
 
 
 %% Calc Reliability against Tension Fatigue -> lots of cases
 
-for l = 1:1000000 % how many iterations to I need to reach convergence? Adjust this number accordingly!
+for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust this number accordingly!
     %% Generate random values:
     
     % 1. Load = Amplitude -> Weibull Distribution
@@ -82,10 +82,10 @@ for l = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
 
 % Get precalculated MoorDyn and rainflow results
 % First find out which iteration of MoorDynCalc to use:
-    j = Amp_rand_value/Axstep;
+    MDit = Amp_rand_value/Axstep;
 % Then get rainflow count for that iteration:
-    M_R1 = readmatrix(M_R1,'M_R1.xlsx','Sheet',j);
-    M_BinCountsVector = readmatrix(M_BinCountsVector,'M_BinCountsVector.xlsx','Sheet',j);
+    M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit);
+    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit);
 
 len_M_R1 = length(M_R1);
 
