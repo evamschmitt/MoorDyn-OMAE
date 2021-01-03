@@ -50,6 +50,7 @@ nls = width(M_R1);
 %% Calc Reliability against Tension Fatigue -> lots of cases
 
 for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust this number accordingly!
+    tic
     %% Generate random values:
     
     % 1. Load = Amplitude -> Weibull Distribution
@@ -112,7 +113,36 @@ R = R1/R2;                                  % (R1 = tension range, R2 = referenc
 AnnualDamagePerSegment(k, 1) = Damage*365*24*60*60/runtime;     % Fatigue Damage Annual
 
 
+
+
+writematrix(Mfatout, 'result_fatigue_annual.xls');  % Save output matrix to Excel
+
+toc
 end
+
+%% Before this create survival matrix that you then later save!
+
+Lifetime_Damage = AnnualDamagePerSegment.*25;                    % for 25years runtime
+
+Survival = ones(nls,1);                                      % Creates Surival Vector with ones (=survival) as default
+
+for 1:nls
+    if Lifetime_Damage(1,nls) > 1
+    Survival(1,nls) = 0;
+    end
+end
+
+% save survival to excel
+writematrix(Survival,'Survival.xlsx','Sheet',j);
+
+
+
+Survival_Out(:, j) = Survival;                              % Add annual damage per segment for this iteration to output matrix
+Lifetime_Damage_Out(:, j)  = Lifetime_Damage;                % same for mean tension per segment
+
+writematrix(Survival_Out, 'Survival.xls');  % Save output matrix to Excel
+writematrix(Lifetime_Damage_Out, 'Lifetime_Damage.xls');
+
 
 end
 
