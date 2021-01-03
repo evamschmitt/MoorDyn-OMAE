@@ -129,7 +129,7 @@ end
 % for later reliability analysis write R1 and BinCountsVector Matrices to
 % Excel spreadsheet (1st run = spreadsheet 1, 2nd = ...)
 writematrix(M_R1,'M_R1.xlsx','Sheet',j);
-writematrix(M_R1,'M_BinCountsVector.xlsx','Sheet',j);
+writematrix(M_BinCountsVector,'M_BinCountsVector.xlsx','Sheet',j);
 
 
 % Collect Fatigue Data in Matrix
