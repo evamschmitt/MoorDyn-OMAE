@@ -59,20 +59,25 @@ AnnualDamagePerSegment = zeros(nls, 1);
 %% Time prep     
 runtime = length(tenperseg)*dt;                % get considered runtime in s
 
+%% Create Matrix to store Rainflow results (for later processing in reliability process)
+
+M_R1 = zeros(nls, 10);                 % 10 placeholder here, not clear how many bincounts there are/will be. Actually, enlarge matrix later if vectors grow dynamically.
+M_BinCountsVector = zeros(nls, 10);    % 10 placeholder here, not clear how many bincounts there are/will be.
+
 %% Fatigue Analysis Loop 
 
 for k = 1:nls 
 Z = tenperseg(:,k);                 % pick tension per segment
 
 % Rainflow Counting
-[C,BinCounts,BinEdges] = rainflow(Z); %AH, hier C relevante outputmatrix
+[C,BinCounts,BinTensionRange] = rainflow(Z); %AH, hier C relevante outputmatrix
 BinCountsVector = sum(BinCounts,2);         % Gibt BinCounts für Bins in Vektor an. = N
 
 
 
 % BinMean (Vektor mit Tensionmittelwerten von BinEdges) erstellen
-BinMean = BinEdges + (BinEdges(2) - BinEdges(1))/2;
-BinMean(end) = [];
+BinMeanTensionRange = BinTensionRange + (BinTensionRange(2) - BinTensionRange(1))/2;
+BinMeanTensionRange(end) = [];
 
 %% Calculate Damage
 
@@ -83,19 +88,29 @@ BinMean(end) = [];
 % M, K = from table API RP 2SK, for chain common studlink
 
 
-% NR^M = K, 
-R1 = BinMean;
+%R = Ratio of tension range (double amplitude) to reference breaking strength (RBS).
+R1 = BinMeanTensionRange;
+
+
 R = R1/R2;                                  % (R1 = tension range, R2 = reference breaking strength)
 
 
+%Write calc results for R1 and BinCountsVector to matrix now to write later in sheet
+%processing in reliability calculation
+
+lenR1 = length(R1);
+
+M_R1(1:lenR1,k) = R1;
+M_BinCountsVector(1:lenR1,k) = BinCountsVector; % works because R1 and BCV same length.
 
 
+% N = max. possible number of cycles
 N = K./(R.^M); %Das ist die Kurve für max. Tension
 
 
 % Damage Bins -> Gesamtschaden.
-Damage = BinCountsVector./N;
-Damage = sum(Damage);
+Damage = BinCountsVector./N; % Damage per bin = actual cycles per bin / max. possible cycles (this is per bin)
+Damage = sum(Damage);       % sum the bin damage up to get total damage
 
 % Create Fatigue Damage Vector (Element 1 close to Anchor)
 DamagePerSegment(k, 1) = Damage;                                % Fatigue Damage for considered Runtime
@@ -110,6 +125,11 @@ AnnualDamagePerSegment(k, 1) = Damage*365*24*60*60/runtime;     % Fatigue Damage
 %xlabel('Stress Range')  
 %ylabel('Cycle Counts')
 end
+
+% for later reliability analysis write R1 and BinCountsVector Matrices to
+% Excel spreadsheet (1st run = spreadsheet 1, 2nd = ...)
+writematrix(M_R1,'M_R1.xlsx','Sheet',j);
+writematrix(M_R1,'M_BinCountsVector.xlsx','Sheet',j);
 
 
 % Collect Fatigue Data in Matrix
