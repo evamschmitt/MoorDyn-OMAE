@@ -30,6 +30,11 @@ R2_base = R2;       % to save original R2 value, when uncertainty is applied lat
 Amp_scaleParameter = 3;     % just assumption In Weibull analysis, what exactly is the scale parameter, η (Eta)? And why, at t = η , will 63.21% of the population have failed, regardless of the value of the shape parameter, β (Beta)?
 Amp_shapeParameter = 2;     % just assumption
 
+% 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
+% values)
+mean_SimAppLoad = 1;
+standard_deviation_SimAppLoad = 0.05;
+
 
 % 2. Resistance (Max. endurable fatigue) = reference breaking strength = R2
 mean_R2 = R2;
@@ -62,12 +67,18 @@ for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
         if Amp_rand_value > Ax_end
             Amp_rand_value = Ax_end;    
         end
+        
+        
+    % 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
+    % values)
+    SimAppLoad_rand_value = normrnd(mean_SimAppLoad, standard_deviation_SimAppLoad);
+    
 
     % 2. Resistance (Max. endurable fatigue) = reference breaking strength = R2
         R2_rand_value = normrnd(mean_R2, standard_deviation_R2);
         % Apply randomness to R2 defined (base) value
-        R2 = R2_base*R2_rand_value;
-
+        R2 = R2_rand_value;
+        
     % 3. Miner Sum
         MinerSum_rand_value = lognrnd(MinerSum_Mean_of_logarithmic_values, MinerSum_standard_derivation_of_logarithmic_values);
 
@@ -85,9 +96,9 @@ for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
 % First find out which iteration of MoorDynCalc to use:
     MDit = Amp_rand_value/Axstep;
     MDit = round(MDit); %Maybe round because Sheet function below can take only whole numbers, so the zeros are taken away? does this matter?
-% Then get rainflow count for that iteration:
-    M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit);
-    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit);
+% Then get rainflow count for that iteration and apply uncertainty to it:
+    M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit)*SimAppLoad_rand_value;
+    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit)*SimAppLoad_rand_value;
 
 len_M_R1 = length(M_R1);
 
