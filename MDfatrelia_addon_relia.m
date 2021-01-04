@@ -134,10 +134,6 @@ for k = 1:nls
 end
 
 % save survival to excel
-writematrix(Survival,'Survival.xlsx','Sheet',j);
-
-
-
 Survival_Out(:, j) = Survival;                              % Add annual damage per segment for this iteration to output matrix
 Lifetime_Damage_Out(:, j)  = Lifetime_Damage;                % same for mean tension per segment
 
