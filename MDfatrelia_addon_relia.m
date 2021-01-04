@@ -45,7 +45,7 @@ MinerSum_standard_derivation_of_logarithmic_values = 0.05; % just assumption for
 %% Get further variables from outputfiles
 M_R1 = readmatrix('M_R1.xlsx','Sheet',1);
 nls = width(M_R1);
-
+%nls = 50;
 
 %% Calc Reliability against Tension Fatigue -> lots of cases
 
@@ -84,6 +84,7 @@ for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
 % Get precalculated MoorDyn and rainflow results
 % First find out which iteration of MoorDynCalc to use:
     MDit = Amp_rand_value/Axstep;
+    MDit = round(MDit); %Maybe round because Sheet function below can take only whole numbers, so the zeros are taken away? does this matter?
 % Then get rainflow count for that iteration:
     M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit);
     M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit);
@@ -105,7 +106,7 @@ R = R1/R2;                                  % (R1 = tension range, R2 = referenc
 
 % Damage Bins -> Gesamtschaden.
     Damage = BinCountsVector./N; % Damage per bin = actual cycles per bin / max. possible cycles (this is per bin)
-    Damage = sum(Damage)*MinerSum_rand_value;       % sum the bin damage up to get total damage
+    Damage = sum(Damage);       % sum the bin damage up to get total damage
 
 % Create Fatigue Damage Vector (Element 1 close to Anchor)
     DamagePerSegment(k, 1) = Damage;                                % Fatigue Damage for considered Runtime
@@ -126,8 +127,8 @@ Lifetime_Damage = AnnualDamagePerSegment.*25;                    % for 25years r
 
 Survival = ones(nls,1);                                      % Creates Surival Vector with ones (=survival) as default
 
-for 1:nls
-    if Lifetime_Damage(1,nls) > 1
+for k = 1:nls
+    if Lifetime_Damage(k, 1) > MinerSum_rand_value % MinerSum_rand_value should be around 1, Distribution for Uncertainty Miner Sum
     Survival(1,nls) = 0;
     end
 end
