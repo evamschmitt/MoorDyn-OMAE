@@ -57,7 +57,7 @@ nls = width(M_R1);
 
 %% Calc Reliability against Tension Fatigue -> lots of cases
 
-runs = 10; %10000
+runs = 10000; %10000
 
 % Prepare vector to save all the results
 Survival_Average = zeros(nls,1);
