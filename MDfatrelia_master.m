@@ -50,7 +50,7 @@ Ax_start = 0;                                  % Amplitude Surge X [m] (Start, c
 Ax = Ax_start;
 Ay_start = 0;                                  % Amplitude Surge Y [m] (Start, can be stepped up later)
 Ay = Ay_start;
-P = 4;                                  % Period [s]
+P = 300;                                  % Period [s]
 
 
 %% Give Loop Definition
