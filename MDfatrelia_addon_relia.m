@@ -80,7 +80,8 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
     
 
     % 2. Resistance (Max. endurable fatigue) = reference breaking strength = R2
-        R2_rand_value = lognrnd(mean_R2, standard_deviation_R2);
+        %R2_rand_value = lognrnd(mean_R2, standard_deviation_R2); %->doesn't work become infinite, instead:
+        R2_rand_value = lognrnd(1, standard_deviation_R2)*mean_R2;
         % Apply randomness to R2 defined (base) value
         R2 = R2_rand_value;
         
@@ -147,7 +148,7 @@ Survival = ones(nls,1);                                      % Creates Surival V
 
 for k = 1:nls
     if Lifetime_Damage(k, 1) > MinerSum_rand_value % MinerSum_rand_value should be around 1, Distribution for Uncertainty Miner Sum
-    Survival(1,nls) = 0;
+    Survival(nls,1) = 0;
     end
 end
 % Save all the results in one vector
@@ -160,6 +161,7 @@ Lifetime_Damage_Average = Lifetime_Damage_Average + Lifetime_Damage./runs;      
 
 Survival_Average
 Lifetime_Damage_Average
+MinerSum_rand_value
 toc
 
 end
