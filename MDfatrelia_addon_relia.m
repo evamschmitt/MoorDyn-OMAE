@@ -17,6 +17,9 @@ nloop = 200;
 
 Ax_end = nloop*Axstep;
 
+% give simulation time [s]
+runtime = 300;
+
 % Fatigue specific Inputs (Factors)
 M = 3;              % Factor siehe API RP 2SK - FUER COMMON STUDLESS LINK CHAIN
 K = 316;            % Factor siehe API RP 2SK - FUER COMMON STUDLESS LINK CHAIN (CHECK FOR SEMISUB!)
@@ -54,7 +57,9 @@ nls = width(M_R1);
 
 %% Calc Reliability against Tension Fatigue -> lots of cases
 
-for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust this number accordingly!
+runs = 100000;
+
+for j = 1:runs  % how many iterations to I need to reach convergence? Adjust this number accordingly!
     tic
     %% Generate random values:
     
@@ -71,11 +76,11 @@ for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
         
     % 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
     % values)
-    SimAppLoad_rand_value = normrnd(mean_SimAppLoad, standard_deviation_SimAppLoad);
+    SimAppLoad_rand_value = lognrnd(mean_SimAppLoad, standard_deviation_SimAppLoad);
     
 
     % 2. Resistance (Max. endurable fatigue) = reference breaking strength = R2
-        R2_rand_value = normrnd(mean_R2, standard_deviation_R2);
+        R2_rand_value = lognrnd(mean_R2, standard_deviation_R2);
         % Apply randomness to R2 defined (base) value
         R2 = R2_rand_value;
         
@@ -94,7 +99,7 @@ for j = 1:1000000 % how many iterations to I need to reach convergence? Adjust t
 
 % Get precalculated MoorDyn and rainflow results
 % First find out which iteration of MoorDynCalc to use:
-    MDit = Amp_rand_value/Axstep;
+    MDit = Amp_rand_value/Axstep + 1; %+1 because sheets start from sheet 1, so if amp is roundet zero, it has a sheet.
     MDit = round(MDit); %Maybe round because Sheet function below can take only whole numbers, so the zeros are taken away? does this matter?
 % Then get rainflow count for that iteration and apply uncertainty to it:
     M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit)*SimAppLoad_rand_value;
@@ -127,9 +132,11 @@ AnnualDamagePerSegment(k, 1) = Damage*365*24*60*60/runtime;     % Fatigue Damage
 
 
 
-writematrix(Mfatout, 'result_fatigue_annual.xls');  % Save output matrix to Excel
+%writematrix(Mfatout, 'result_fatigue_annual.xls');  % Save output matrix
+%to Excel
+% no need since already done in previous fat calcs.
 
-toc
+
 end
 
 %% Before this create survival matrix that you then later save!
@@ -143,14 +150,20 @@ for k = 1:nls
     Survival(1,nls) = 0;
     end
 end
+% Save all the results in one vector
+Survival_Average = zeros(nls,1);
+Lifetime_Damage_Average = zeros(nls,1);
 
 % save survival to excel
-Survival_Out(:, j) = Survival;                              % Add annual damage per segment for this iteration to output matrix
-Lifetime_Damage_Out(:, j)  = Lifetime_Damage;                % same for mean tension per segment
+Survival_Average = Survival_Average + Survival./runs;                              % Add annual damage per segment for this iteration to output matrix
+Lifetime_Damage_Average = Lifetime_Damage_Average + Lifetime_Damage./runs;                % same for mean tension per segment
 
-writematrix(Survival_Out, 'Survival.xls');  % Save output matrix to Excel
-writematrix(Lifetime_Damage_Out, 'Lifetime_Damage.xls');
-
+Survival_Average
+Lifetime_Damage_Average
+toc
 
 end
 
+
+writematrix(Survival_Average, 'Survival_Average.xls');  % Save output matrix to Excel
+writematrix(Lifetime_Damage_Average, 'Lifetime_Damage_Average.xls');
