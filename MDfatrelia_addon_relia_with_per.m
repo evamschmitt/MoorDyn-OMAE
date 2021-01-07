@@ -69,8 +69,14 @@ Periods = flip(Periods); % for more realistic loads
 Per_scaleParameter = 1;
 Per_shapeParameter = 1;
 
+% Number of runs to determine lifetime damage for one scenario:
+runs_for_lifetime_damage = 20;
+
 for j = 1:runs  % how many iterations to I need to reach convergence? Adjust this number accordingly!
     tic
+    Lifetime_Damage = 0; %reset lifetime damage for next iteration
+    
+    for l = 1:runs_for_lifetime_damage
     %% Generate random values:
     
     % 1. Load = Amplitude -> Weibull Distribution
@@ -185,8 +191,8 @@ end
 
 %% Before this create survival matrix that you then later save!
 
-Lifetime_Damage = AnnualDamagePerSegment.*25;                    % for 25years runtime
-
+Lifetime_Damage = Lifetime_Damage + AnnualDamagePerSegment.*25./runs_for_lifetime_damage; %   % for 25years runtime
+    end
 Survival = ones(nls,1);                                      % Creates Surival Vector with ones (=survival) as default
 
 for k = 1:nls
@@ -204,7 +210,10 @@ Survival_Average
 Lifetime_Damage_Average
 %Lifetime_Damage
 MinerSum_rand_value
+j
 toc
+
+
 
 end
 
