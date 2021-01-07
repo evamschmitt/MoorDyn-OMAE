@@ -25,7 +25,7 @@ dt =  0.01;              %0.01;                          % coupling time step si
 Nts = (simtime+ST+CET)/dt;              %37200;                  % number of coupling time steps (add 120s to cut away from simulation at start and ending)
 
 % Give Number of Line Segments (also change in lines.txt (Inputfile))
-nls = 50;                       % 100
+nls = 100;                       % 100
 
 % Give paths
 % Give MoorDyn Library paths
@@ -46,7 +46,7 @@ R2 = 8167000;       % Minimum Breaking Strength [N] FOR 90MM R4 STUDLESS CHAIN (
 
 
 %% Give Floater Movement
-Ax_start = 10;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
+Ax_start = 0;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
 Ax = Ax_start;
 Ay_start = 0;                                     % Amplitude Surge Y [m] (Start, can be stepped up later)
 Ay = Ay_start;  
@@ -55,8 +55,8 @@ P = 60;                                  % Period [s]
 
 %% Give Loop Definition
 
-nloop = 1;                              % number of loops
-Axstep = 0;                              % per loop: how much is Ax [m] stepped up
+nloop = 200;                              % number of loops
+Axstep = 0.1;                              % per loop: how much is Ax [m] stepped up
 Aystep = 0;                              % per loop: how much is Ay [m] stepped up
 
 %% Prep Fatigue Output Matrix
