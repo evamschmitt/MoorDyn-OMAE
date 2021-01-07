@@ -30,8 +30,8 @@ R2_base = R2;       % to save original R2 value, when uncertainty is applied lat
 % Give uncertainity distribution factors to determine random values later
 
 % 1. Load = Amplitude -> Weibull Distribution
-Amp_scaleParameter = 3;     % just assumption In Weibull analysis, what exactly is the scale parameter, η (Eta)? And why, at t = η , will 63.21% of the population have failed, regardless of the value of the shape parameter, β (Beta)?
-Amp_shapeParameter = 2;     % just assumption
+Amp_scaleParameter = 1;     % just assumption In Weibull analysis, what exactly is the scale parameter, η (Eta)? And why, at t = η , will 63.21% of the population have failed, regardless of the value of the shape parameter, β (Beta)?
+Amp_shapeParameter = 1;     % just assumption
 
 % 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
 % values)
@@ -51,7 +51,7 @@ MinerSum_standard_derivation_of_logarithmic_values = 0.05; %0.05; % just assumpt
 
 
 %% Get further variables from outputfiles
-M_R1 = readmatrix('M_R1.xlsx','Sheet',1);
+M_R1 = readmatrix('M_R1_1sec.xlsx','Sheet',1);
 nls = width(M_R1);
 %nls = 50;
 
@@ -62,6 +62,12 @@ runs = 10000; %10000
 % Prepare vector to save all the results
 Survival_Average = zeros(nls,1);
 Lifetime_Damage_Average = zeros(nls,1);
+
+% Prepare things for choosing Period.
+Periods = [1 2 3 5 10 30 60 300]; % create vector with chosen periods
+Periods = flip(Periods); % for more realistic loads
+Per_scaleParameter = 1;
+Per_shapeParameter = 1;
 
 for j = 1:runs  % how many iterations to I need to reach convergence? Adjust this number accordingly!
     tic
@@ -77,6 +83,7 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
             Amp_rand_value = Ax_end;    
         end
         
+        %1.a periode
         
     % 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
     % values)
@@ -109,9 +116,38 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
 % First find out which iteration of MoorDynCalc to use:
     MDit = Amp_rand_value/Axstep + 1; %+1 because sheets start from sheet 1, so if amp is roundet zero, it has a sheet.
     MDit = round(MDit); %Maybe round because Sheet function below can take only whole numbers, so the zeros are taken away? does this matter?
-% Then get rainflow count for that iteration and apply uncertainty to it:
-    M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit)*SimAppLoad_rand_value;
-    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit)*SimAppLoad_rand_value;
+
+
+
+% Prepare to get period
+Per_Weibull = wblrnd(Per_scaleParameter, Per_shapeParameter);
+% round rand value
+        Per_Weibull = round(Per_Weibull, 0);
+        % if rand value is larger than max. calculated value, set rand value to
+        % max. calculated value:
+        len_Periods = length(Periods);
+        if Per_Weibull > len_Periods
+            Per_Weibull = len_Periods;    
+        end
+        if Per_Weibull == 0 %because I have no zero period, we start at place one
+            Per_Weibull = 1;
+        end
+        
+ % Get according Period to Distribution
+ Per_Rand = Periods(1, Per_Weibull);       
+        
+%         
+% M_R1_xls_name = fullfile('M_R1_', Per_Rand, 'sec.xlsx');
+% M_BinCountsVector_name = fullfile('M_BinCountsVector', Per_Rand, 'sec.xlsx');
+Per_Rand = num2str(Per_Rand); %convert to text so can be processed below
+M_R1_xls_name = append('M_R1_', Per_Rand, 'sec.xlsx');
+M_BinCountsVector_name = append('M_BinCountsVector_', Per_Rand, 'sec.xlsx');
+
+
+    
+    % Then get rainflow count for that iteration and apply uncertainty to it:
+    M_R1 = readmatrix(M_R1_xls_name,'Sheet',MDit)*SimAppLoad_rand_value;
+    M_BinCountsVector = readmatrix(M_BinCountsVector_name,'Sheet',MDit)*SimAppLoad_rand_value;
 
 len_M_R1 = length(M_R1);
 
@@ -164,10 +200,10 @@ end
 Survival_Average = Survival_Average + Survival./runs;                              % Add annual damage per segment for this iteration to output matrix
 Lifetime_Damage_Average = Lifetime_Damage_Average + Lifetime_Damage./runs;                % same for mean tension per segment
 
-% Survival_Average
-% Lifetime_Damage_Average
-% %Lifetime_Damage
-% MinerSum_rand_value
+Survival_Average
+Lifetime_Damage_Average
+%Lifetime_Damage
+MinerSum_rand_value
 toc
 
 end
