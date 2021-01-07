@@ -30,7 +30,7 @@ R2_base = R2;       % to save original R2 value, when uncertainty is applied lat
 % Give uncertainity distribution factors to determine random values later
 
 % 1. Load = Amplitude -> Weibull Distribution
-Amp_scaleParameter = 1;     % just assumption In Weibull analysis, what exactly is the scale parameter, η (Eta)? And why, at t = η , will 63.21% of the population have failed, regardless of the value of the shape parameter, β (Beta)?
+Amp_scaleParameter = 2;     % just assumption In Weibull analysis, what exactly is the scale parameter, η (Eta)? And why, at t = η , will 63.21% of the population have failed, regardless of the value of the shape parameter, β (Beta)?
 Amp_shapeParameter = 1;     % just assumption
 
 % 1.b Uncertainty for Simplified Approach to Load (having pre-defined, rounded
@@ -66,7 +66,7 @@ Lifetime_Damage_Average = zeros(nls,1);
 % Prepare things for choosing Period.
 Periods = [1 2 3 5 10 30 60 300]; % create vector with chosen periods
 Periods = flip(Periods); % for more realistic loads
-Per_scaleParameter = 1;
+Per_scaleParameter = 2;
 Per_shapeParameter = 1;
 
 % Number of runs to determine lifetime damage for one scenario:

@@ -14,7 +14,7 @@
 % MoorDyn specific Inputs
 
 % give simulation time [s]
-simtime = 300;
+simtime = 1200;     %20min
 
 % Cut out start and end time of simulation for Fatigue Calc
 ST = 60;            % Start Time in [s] (cut out time before that from analysis)
@@ -46,17 +46,17 @@ R2 = 8167000;       % Minimum Breaking Strength [N] FOR 90MM R4 STUDLESS CHAIN (
 
 
 %% Give Floater Movement
-Ax_start = 0;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
+Ax_start = 10;                                  % Amplitude Surge X [m] (Start, can be stepped up later)
 Ax = Ax_start;
-Ay_start = 0;                                  % Amplitude Surge Y [m] (Start, can be stepped up later)
-Ay = Ay_start;
-P = 3;                                  % Period [s]
+Ay_start = 0;                                     % Amplitude Surge Y [m] (Start, can be stepped up later)
+Ay = Ay_start;  
+P = 60;                                  % Period [s]
 
 
 %% Give Loop Definition
 
-nloop = 200;                              % number of loops
-Axstep = 0.1;                              % per loop: how much is Ax [m] stepped up
+nloop = 1;                              % number of loops
+Axstep = 0;                              % per loop: how much is Ax [m] stepped up
 Aystep = 0;                              % per loop: how much is Ay [m] stepped up
 
 %% Prep Fatigue Output Matrix
@@ -65,6 +65,12 @@ Mfatout = zeros ([nls nloop]);
 
 Mtenmean = zeros ([nls nloop]);
 
+% First of all, delete old files before writing new ones, otherwise old
+% content still possibly in there!
+delete('M_R1.xlsx');
+delete('M_BinCountsVector.xlsx');
+delete('result_fatigue_annual.xls');
+delete('result_tension_mean.xls');
 
 %% Run multiple Simulations Loop
 
