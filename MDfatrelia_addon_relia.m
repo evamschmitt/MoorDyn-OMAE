@@ -37,11 +37,21 @@ Amp_variance = 3;
 % 2. Uncertainty Resistance (how much damage can the system take?)
 % Lognormal Distribution
 % Mu and Sigma parameters therefor
-% the below are calculated for 1 mean and 0.05 variance
+% the below are calculated for 1 mean and 0.05 standart deviation (this
+% leads to 0.0025 variance)
 % see matlab webpage help on how to calculate
-mu = -0.0244;
-sigma = 0.2209;
+mu_resistance = -0.0012;
+sigma_resistance = 0.0500;
 
+% 3. Uncertainty Approach to Reliability Calculation (MinerSum/Summation
+% BinCounts)
+% Lognormal Distribution
+% Mu and Sigma parameters therefor
+% the below are calculated for 1 mean and 0.05 standart deviation (this
+% leads to 0.0025 variance)
+% see matlab webpage help on how to calculate
+mu_approach = -0.0012;
+sigma_approach = 0.0500;
 
 %% Get further variables from outputfiles
 M_R1 = readmatrix('M_R1.xlsx','Sheet',1);
@@ -80,12 +90,15 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
         if Amp_rand_value < 0
             Amp_rand_value = 0;
         end
-            
         
 
-    % 2. Resistance (Max. endurable fatigue) rand value (vary around the
+    % 2. Resistance (breaking strength) rand value (vary around the
     % total damage 1)
-    resistance_rand = lognrnd(mu,sigma);
+    resistance_rand = lognrnd(mu_resistance, sigma_resistance);
+    
+    
+    % 2. Uncertainty about approach to fatigue
+    approach_rand = lognrnd(mu_approach, sigma_approach);
            
 
 %% Calc Fatigue for current set of random values:
@@ -108,7 +121,7 @@ BinCountsVector = M_BinCountsVector(1:len_M_R1,k); % works because R1 and BCV sa
 
 
 
-R = R1/R2;                                  % (R1 = tension range, R2 = reference breaking strength)
+R = R1/(R2*resistance_rand);                                  % (R1 = tension range, R2 = reference breaking strength)
 
 % N = max. possible number of cycles
     N = K./(R.^M); %Das ist die Kurve für max. Tension
@@ -116,6 +129,7 @@ R = R1/R2;                                  % (R1 = tension range, R2 = referenc
 % Damage Bins -> Gesamtschaden.
     Damage = BinCountsVector./N; % Damage per bin = actual cycles per bin / max. possible cycles (this is per bin)
     Damage = sum(Damage);       % sum the bin damage up to get total damage
+    Damage = Damage.*approach_rand; % Apply uncertainty of damage calc approach
 
 % Create Fatigue Damage Vector (Element 1 close to Anchor)
     DamagePerSegment(k, 1) = Damage;                                % Fatigue Damage for considered Runtime
@@ -139,7 +153,7 @@ Lifetime_Damage = AnnualDamagePerSegment.*25;                    % for 25years r
 Survival = ones(nls,1);                                      % Creates Surival Vector with ones (=survival) as default
 
 for k = 1:nls
-    if Lifetime_Damage(k, 1) > resistance_rand % value should be around 1
+    if Lifetime_Damage(k, 1) > 1 
     Survival(k,1) = 0;
     end
 end
@@ -158,7 +172,7 @@ j
 toc
 
 end
-
-
+Lifetime_Damage_Average
+Survival_Average
 writematrix(Survival_Average, 'Survival_Average.xls');  % Save output matrix to Excel
 writematrix(Lifetime_Damage_Average, 'Lifetime_Damage_Average.xls');
