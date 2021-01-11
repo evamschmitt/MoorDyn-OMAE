@@ -60,6 +60,10 @@ Lifetime_Damage_Average = zeros(nls,1);
 delete('Survival_Average.xls');
 delete('Lifetime_Damage_Average.xls');
 
+% For reproducability of results, random numbers are always generated the
+% same way
+rng('default');
+
 for j = 1:runs  % how many iterations to I need to reach convergence? Adjust this number accordingly!
     tic
     %% Generate random values:
@@ -73,6 +77,10 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
         if Amp_rand_value > Ax_end
             Amp_rand_value = Ax_end;    
         end
+        if Amp_rand_value < 0
+            Amp_rand_value = 0;
+        end
+            
         
 
     % 2. Resistance (Max. endurable fatigue) rand value (vary around the
@@ -87,8 +95,8 @@ for j = 1:runs  % how many iterations to I need to reach convergence? Adjust thi
     MDit = Amp_rand_value/Axstep + 1; %+1 because sheets start from sheet 1, so if amp is roundet zero, it has a sheet.
     MDit = round(MDit); %Maybe round because Sheet function below can take only whole numbers, so the zeros are taken away? does this matter?
 % Then get rainflow count for that iteration and apply uncertainty to it:
-    M_R1 = readmatrix('M_R1.xlsx','Sheet',MDit);
-    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','Sheet',MDit);
+    M_R1 = readmatrix('M_R1.xlsx','UseExcel',1,'Sheet',MDit);
+    M_BinCountsVector = readmatrix('M_BinCountsVector.xlsx','UseExcel',1,'Sheet',MDit);
 
 len_M_R1 = length(M_R1);
 
@@ -145,6 +153,8 @@ Lifetime_Damage_Average = Lifetime_Damage_Average + Lifetime_Damage./runs;      
 % Lifetime_Damage_Average
 % %Lifetime_Damage
 % MinerSum_rand_value
+fprintf('loop nuber')
+j
 toc
 
 end

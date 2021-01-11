@@ -4,7 +4,7 @@
 %% Make necessary inputs:
 
 % Give Number of Line Segments
-nls = 50;
+nls = 100;
 
 % Give File paths
 OutputFileLocation = 'Mooring/Line1.out';
